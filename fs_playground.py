@@ -15,7 +15,7 @@ pin = input("Enter the PIN provided by FatSecret: ")
 session_token = fs.authenticate(pin)
 
 #Iterate through months
-start_date = datetime(2022, 1, 1)
+start_date = datetime(2021, 1, 1)
 end_date = datetime.now()
 delta = relativedelta(months=1)
 meal = []
@@ -23,9 +23,12 @@ while start_date <= end_date:
     print(start_date.strftime("%Y-%m-%d"))
     try:
         month_info=fs.food_entries_get_month(start_date)
-        print(f"{start_date}\n{month_info}")
+        print(f"{start_date}\n{month_info} - end month")
+        print(type(month_info))
 
         if month_info:
+            if type(month_info) == dict:
+                month_info = [month_info]
             for item in month_info:
                 day = datetime(1970,1,1,0,0) + timedelta(int(item['date_int']))
                 try:
@@ -33,13 +36,20 @@ while start_date <= end_date:
                     print(day.strftime("%Y-%m-%d"))
                     print(meal)
                     time.sleep(10)
-                except:
+                except Exception as e:
                     print(f"Requests limit. Last day is: {day}")
+                    print(type(e))
+                    print(e.args)
+                    print(e)
+
                     break
 
         start_date += delta
-    except:
+    except Exception as e:
         print(f"Requests limit. Last date is: {start_date}")
+        print(type(e))
+        print(e.args)
+        print(e)
         break
 
 df = pd.DataFrame(meal)
